@@ -2060,7 +2060,7 @@ LeftGroupBox:AddToggle('Health Bar Toggle', {
     end
 })
 
-local RightGroupBox = Tabs.Player:AddRightGroupbox('Audio Player')  
+local RightGroupBox = Tabs.Visuals:AddRightGroupbox('Audio Player')  
 
 local soundEnabled = false 
 local soundVolume = 1
