@@ -2060,6 +2060,61 @@ LeftGroupBox:AddToggle('Health Bar Toggle', {
     end
 })
 
+local FORCEFIELD_MATERIAL = Enum.Material.ForceField
+local DEFAULT_MATERIAL = Enum.Material.Plastic
+local DEFAULT_COLOR = Color3.fromRGB(255, 255, 255)
+local currentColor = Color3.fromRGB(0, 255, 0)
+local forcefieldEnabled = false
+
+local lastUpdateTime = 0
+local updateInterval = 0.1
+
+local function customizeCharacter(character, newColor)
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            if forcefieldEnabled then
+                part.Color = newColor
+                part.Material = FORCEFIELD_MATERIAL
+            else
+                part.Material = DEFAULT_MATERIAL
+                part.Color = DEFAULT_COLOR
+            end
+        end
+    end
+end
+
+local function onCharacterAdded(character)
+    if forcefieldEnabled then
+        customizeCharacter(character, currentColor)
+    end
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
+
+LeftGroupBox:AddToggle('ForcefieldToggle', {
+    Text = 'Forcefield',
+    Default = false,
+    Tooltip = 'Toggle the forcefield effect on your character.',
+    Callback = function(Value)
+        forcefieldEnabled = Value
+        local character = player.Character
+        if character then
+            customizeCharacter(character, currentColor)
+        end
+    end
+}):AddColorPicker('ForcefieldColorPicker', {
+    Default = currentColor,
+    Title = 'Select Forcefield Color',
+    Transparency = 0,
+    Callback = function(Value)
+        currentColor = Value
+        local character = player.Character
+        if forcefieldEnabled and character then
+            customizeCharacter(character, currentColor)
+        end
+    end
+})
+
 local RightGroupBox = Tabs.Visuals:AddRightGroupbox('Audio Player')  
 
 local soundEnabled = false 
