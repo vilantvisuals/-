@@ -2158,4 +2158,123 @@ RightGroupBox:AddButton({
     Tooltip = 'Plays the selected sound' 
 })
 
+getgenv().envt = Tabs.Visuals:AddLeftGroupbox("Ambience")
+getgenv().Lighting = game:GetService("Lighting")
+
+getgenv().DefaultFogStart = Lighting.FogStart
+getgenv().DefaultFogEnd = Lighting.FogEnd
+getgenv().DefaultFogColor = Lighting.FogColor
+getgenv().DefaultAmbient = Lighting.Ambient
+getgenv().DefaultTechnology = Lighting.Technology.Name
+
+getgenv().FogModified = false
+getgenv().AmbientModified = false
+
+envt:AddToggle('FogToggle', {
+    Text = 'Fog',
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            Lighting.FogEnd = getgenv().FogEnd or DefaultFogEnd
+            Lighting.FogStart = getgenv().FogStart or DefaultFogStart
+            getgenv().FogModified = true  -- Track if fog settings are modified
+        else
+            Lighting.FogEnd = DefaultFogEnd
+            Lighting.FogStart = DefaultFogStart
+            Lighting.FogColor = DefaultFogColor
+            getgenv().FogModified = false  -- Reset flag
+        end
+    end
+}):AddColorPicker('FogColor', {
+    Default = DefaultFogColor,
+    Title = 'Fog Color',
+    Callback = function(Value)
+        Lighting.FogColor = Value
+    end
+})
+
+envt:AddSlider('FogStart', {
+    Text = 'Fog Start',
+    Default = DefaultFogStart,
+    Min = 0,
+    Max = 1000,
+    Rounding = 1,
+    Callback = function(Value)
+        getgenv().FogStart = Value
+        Lighting.FogStart = Value
+    end
+})
+
+envt:AddSlider('FogEnd', {
+    Text = 'Fog End',
+    Default = DefaultFogEnd,
+    Min = 10,
+    Max = 10000,
+    Rounding = 1,
+    Callback = function(Value)
+        getgenv().FogEnd = Value
+        Lighting.FogEnd = Value
+    end
+})
+
+envt:AddToggle('AmbientToggle', {
+    Text = 'Ambient',
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            Lighting.Ambient = getgenv().AmbientColor or DefaultAmbient
+            getgenv().AmbientModified = true
+        else
+            Lighting.Ambient = DefaultAmbient
+            getgenv().AmbientModified = false
+        end
+    end
+}):AddColorPicker('AmbientColor', {
+    Default = DefaultAmbient,
+    Title = 'Ambient Color',
+    Callback = function(Value)
+        getgenv().AmbientColor = Value
+        Lighting.Ambient = Value
+    end
+})
+
+function restoreDefaultLightingSettings()
+    if not getgenv().FogModified then
+        Lighting.FogStart = DefaultFogStart
+        Lighting.FogEnd = DefaultFogEnd
+        Lighting.FogColor = DefaultFogColor
+    end
+    
+    if not getgenv().AmbientModified then
+        Lighting.Ambient = DefaultAmbient
+    end
+end
+
+local RightGroupBox = Tabs.Visuals:AddRightGroupbox('')
+
+local MenuGroup = Tabs['Visuals']:AddRightGroupbox('')
+
+MenuGroup:AddButton('Unload', function() Library:Unload() end)
+
+Library:SetWatermarkVisibility(true)
+
+local FrameTimer = tick()
+local FrameCounter = 0;
+local FPS = 60;
+
+local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(function()
+    FrameCounter += 1;
+
+    if (tick() - FrameTimer) >= 1 then
+        FPS = FrameCounter;
+        FrameTimer = tick();
+        FrameCounter = 0;
+    end;
+
+    Library:SetWatermark(('Sazurn Hub - Da Hood | v1.0.0 | %s fps | %s ms'):format(
+        math.floor(FPS),
+        math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue())
+    ));
+end);
+
 print("SazurnHub | Da Hood | Loaded successfully.")
