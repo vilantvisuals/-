@@ -2305,6 +2305,109 @@ function restoreDefaultLightingSettings()
     end
 end
 
+local RightGroupbox = Tabs.Visuals:AddRightGroupbox('Settings')
+
+RightGroupbox:AddToggle('NoFogToggle', {
+    Text = 'No fog',
+    Default = false,
+    Tooltip = 'This removes any kind of Fog from the game',
+    Callback = function(Value)
+        local lighting = game:GetService("Lighting")
+
+        if Value then
+            if not _G.FogRemovalExecuted then
+                _G.OriginalFogSettings = {
+                    FogEnd = lighting.FogEnd,
+                    FogStart = lighting.FogStart
+                }
+
+                lighting.FogEnd = 100000
+                lighting.FogStart = 0
+
+                local atmosphere = lighting:FindFirstChildOfClass("Atmosphere")
+                if atmosphere then
+                    atmosphere:Destroy()
+                end
+
+                _G.FogRemovalExecuted = true
+            end
+        else
+            if _G.FogRemovalExecuted then
+                lighting.FogEnd = _G.OriginalFogSettings.FogEnd
+                lighting.FogStart = _G.OriginalFogSettings.FogStart
+                _G.FogRemovalExecuted = false
+            end
+        end
+        print('[cb] NoFogToggle changed to:', Value)
+    end
+})
+
+RightGroupbox:AddToggle('BrightToggle', {
+    Text = 'No shadows',
+    Default = false,
+    Tooltip = 'Removes shadows and increases brightness',
+    Callback = function(Value)
+        if not _G.FullBrightExecuted then
+            _G.FullBrightEnabled = false
+
+            local Lighting = game:GetService("Lighting")
+
+            _G.NormalLightingSettings = {
+                Brightness = Lighting.Brightness,
+                ClockTime = Lighting.ClockTime,
+                GlobalShadows = Lighting.GlobalShadows
+            }
+
+            local FullBrightSettings = {
+                Brightness = 1,
+                ClockTime = 12,
+                GlobalShadows = false
+            }
+
+            local function setLightingProperties(properties)
+                for property, value in pairs(properties) do
+                    Lighting[property] = value
+                end
+            end
+
+            setLightingProperties(FullBrightSettings)
+
+            local function createPropertyChangeListener(property, newValue)
+                Lighting:GetPropertyChangedSignal(property):Connect(function()
+                    if Lighting[property] ~= _G.NormalLightingSettings[property] then
+                        _G.NormalLightingSettings[property] = Lighting[property]
+                        if not _G.FullBrightEnabled then
+                            repeat wait() until _G.FullBrightEnabled
+                        end
+                        Lighting[property] = newValue
+                    end
+                end)
+            end
+
+            for property, newValue in pairs(FullBrightSettings) do
+                createPropertyChangeListener(property, newValue)
+            end
+
+            spawn(function()
+                local LatestValue = true
+                while wait() do
+                    if _G.FullBrightEnabled ~= LatestValue then
+                        if not _G.FullBrightEnabled then
+                            setLightingProperties(_G.NormalLightingSettings)
+                        else
+                            setLightingProperties(FullBrightSettings)
+                        end
+                        LatestValue = not LatestValue
+                    end
+                end
+            end)
+        end
+
+        _G.FullBrightExecuted = true
+        _G.FullBrightEnabled = Value
+    end
+})
+
 local RightGroupBox = Tabs.Visuals:AddRightGroupbox('')
 
 local MenuGroup = Tabs['Visuals']:AddRightGroupbox('')
