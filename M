@@ -1532,6 +1532,253 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
+local animationBaseUrl = "http://www.roblox.com/asset/?id="
+
+local animations = {
+    R15 = {
+        idle = animationBaseUrl .. "2510196951",
+        walk = animationBaseUrl .. "2510202577",
+        run = animationBaseUrl .. "2510198475",
+        jump = animationBaseUrl .. "2510197830",
+        climb = animationBaseUrl .. "2510192778",
+        fall = animationBaseUrl .. "2510195892",
+    },
+    Custom = {
+        idle = animationBaseUrl .. "782841498",
+        walk = animationBaseUrl .. "616168032",
+        run = animationBaseUrl .. "616163682",
+        jump = animationBaseUrl .. "1083218792",
+        climb = animationBaseUrl .. "1083439238",
+        fall = animationBaseUrl .. "707829716",
+    },
+     Levitation = {
+        idle = animationBaseUrl .. "616006778",
+        jump = animationBaseUrl .. "616008936",
+        fall = animationBaseUrl .. "616005863",
+        walk = animationBaseUrl .. "616013216",
+        run = animationBaseUrl .. "616010382",
+        climb = animationBaseUrl .. "616003713",
+    },
+    Mage = {
+        idle = animationBaseUrl .. "707742142",
+        jump = animationBaseUrl .. "707853694",
+        fall = animationBaseUrl .. "707829716",
+        walk = animationBaseUrl .. "707897309",
+        run = animationBaseUrl .. "707861613",
+        climb = animationBaseUrl .. "707826056",
+    },
+    Ninja = {
+        idle = animationBaseUrl .. "656117400",
+        jump = animationBaseUrl .. "656117878",
+        fall = animationBaseUrl .. "656115606",
+        walk = animationBaseUrl .. "656121766",
+        run = animationBaseUrl .. "656118852",
+        climb = animationBaseUrl .. "656114359",
+    },
+    Stylish = {
+        idle = animationBaseUrl .. "616136790",
+        jump = animationBaseUrl .. "616139451",
+        fall = animationBaseUrl .. "616134815",
+        walk = animationBaseUrl .. "616146177",
+        run = animationBaseUrl .. "616140816",
+        climb = animationBaseUrl .. "616133594",
+    },
+    Superhero = {
+        idle = animationBaseUrl .. "616111295",
+        jump = animationBaseUrl .. "616115533",
+        fall = animationBaseUrl .. "616108001",
+        walk = animationBaseUrl .. "616122287",
+        run = animationBaseUrl .. "616117076",
+        climb = animationBaseUrl .. "616104706",
+    },
+    Toy = {
+        idle = animationBaseUrl .. "782841498",
+        jump = animationBaseUrl .. "782847020",
+        fall = animationBaseUrl .. "782846423",
+        walk = animationBaseUrl .. "782843345",
+        run = animationBaseUrl .. "782842708",
+        climb = animationBaseUrl .. "782843869",
+    },
+    Vampire = {
+        idle = animationBaseUrl .. "1083445855",
+        jump = animationBaseUrl .. "1083455352",
+        fall = animationBaseUrl .. "1083443587",
+        walk = animationBaseUrl .. "1083473930",
+        run = animationBaseUrl .. "1083462077",
+        climb = animationBaseUrl .. "1083439238",
+    },
+    Werewolf = {
+        idle = animationBaseUrl .. "1083195517",
+        jump = animationBaseUrl .. "1083218792",
+        fall = animationBaseUrl .. "1083189019",
+        walk = animationBaseUrl .. "1083178339",
+        run = animationBaseUrl .. "1083216690",
+        climb = animationBaseUrl .. "1083182000",
+    },
+    Zombie = {
+        idle = animationBaseUrl .. "616158929",
+        jump = animationBaseUrl .. "616161997",
+        fall = animationBaseUrl .. "616157476",
+        walk = animationBaseUrl .. "616168032",
+        run = animationBaseUrl .. "616163682",
+        climb = animationBaseUrl .. "616156119",
+    },
+}
+
+local function applyAnimations(animate, preset)
+    if animate and preset then
+        if animate.idle and animate.idle:FindFirstChild("Animation1") then
+            animate.idle.Animation1.AnimationId = preset.idle
+        else
+            warn("Idle animation or Animation1 not found")
+        end
+        
+        if animate.walk and animate.walk:FindFirstChild("WalkAnim") then
+            animate.walk.WalkAnim.AnimationId = preset.walk
+        else
+            warn("Walk animation or WalkAnim not found")
+        end
+
+        if animate.run and animate.run:FindFirstChild("RunAnim") then
+            animate.run.RunAnim.AnimationId = preset.run
+        else
+            warn("Run animation or RunAnim not found")
+        end
+
+        if animate.jump and animate.jump:FindFirstChild("JumpAnim") then
+            animate.jump.JumpAnim.AnimationId = preset.jump
+        else
+            warn("Jump animation or JumpAnim not found")
+        end
+
+        if animate.climb and animate.climb:FindFirstChild("ClimbAnim") then
+            animate.climb.ClimbAnim.AnimationId = preset.climb
+        else
+            warn("Climb animation or ClimbAnim not found")
+        end
+
+        if animate.fall and animate.fall:FindFirstChild("FallAnim") then
+            animate.fall.FallAnim.AnimationId = preset.fall
+        else
+            warn("Fall animation or FallAnim not found")
+        end
+    end
+end
+
+local function applySelectedAnimations(character)
+    local animate = character:FindFirstChild("Animate")
+    if animate then
+        local selectedPreset = animations[currentAnimationPreset]
+        applyAnimations(animate, selectedPreset)
+    end
+end
+
+local LeftGroupBox = Tabs.Player:AddLeftGroupbox('Player Animations')
+
+LeftGroupBox:AddDropdown('AnimationSelector', {
+    Values = {'R15', 'Custom', 'Levitation', 'Mage', 'Ninja', 'Stylish', 'Superhero', 'Toy', 'Vampire', 'Werewolf', 'Zombie',},
+    Default = 1,
+    Multi = false,
+
+    Text = 'Animation',
+    Tooltip = 'MUST RESET!!!',
+
+    Callback = function(Value)
+        currentAnimationPreset = Value
+    end
+})
+
+local animationLoaded = false
+local player = Players.LocalPlayer
+
+if not player then
+    warn("[Animation Error]: LocalPlayer not found!")
+    return
+end
+
+local function applyAnimations()
+    local character = player.Character
+    if not character or not character.Parent then return end
+    if animationLoaded then return end
+
+    local animate = character:FindFirstChild("Animate")
+    if not animate then 
+        warn("[Animation Error]: Animate script missing!")
+        return 
+    end
+
+    local success, err = pcall(function()
+        applySelectedAnimations(character)
+    end)
+
+    if success then
+        animationLoaded = true
+    elseif not _G.AnimationErrorLogged then
+        warn("[Animation Error]: " .. err)
+        _G.AnimationErrorLogged = true
+    end
+end
+
+local function onCharacterAdded(character)
+    animationLoaded = false
+    repeat task.wait() until character:FindFirstChild("HumanoidRootPart")
+    applyAnimations()
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
+
+if player.Character then
+    task.spawn(function()
+        onCharacterAdded(player.Character)
+    end)
+end
+
+local function onCharacterAdded(character)
+    animationLoaded = false
+    repeat task.wait() until character:FindFirstChild("Humanoid") and character:FindFirstChild("HumanoidRootPart")
+    applyAnimations()
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
+
+if player.Character and player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("HumanoidRootPart") then
+    applyAnimations()
+else
+    task.spawn(function()
+        repeat task.wait() until player.Character and player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("HumanoidRootPart")
+        applyAnimations()
+    end)
+end
+
+local function onCharacterAdded(character)
+    animationLoaded = false
+    repeat task.wait() until character:FindFirstChild("HumanoidRootPart")
+    applyAnimations()
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
+
+if player.Character then
+    task.spawn(function()
+        onCharacterAdded(player.Character)
+    end)
+end
+
+if player.CharacterAdded then
+    player.CharacterAdded:Connect(function()
+        animationLoaded = false
+        task.wait(0.5)
+        applyAnimations()
+    end)
+else
+    warn("[Animation Error]: CharacterAdded event not found!")
+end
+
+task.spawn(function()
+    task.wait(1)
+    applyAnimations()
+end)
+
 DesyncBox = Tabs.Player:AddRightGroupbox("Player Desync")
 
 local UserInputService = game:GetService("UserInputService")
@@ -2407,8 +2654,6 @@ RightGroupbox:AddToggle('BrightToggle', {
         _G.FullBrightEnabled = Value
     end
 })
-
-local RightGroupBox = Tabs.Visuals:AddRightGroupbox('')
 
 local MenuGroup = Tabs['Visuals']:AddRightGroupbox('')
 
