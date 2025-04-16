@@ -24,6 +24,7 @@ print("loading...")
 wait(3)
 
 print("Vilant V2 Loaded")
+print("license: ehzYW378Fwb#####")
 
 local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/vilantvisuals/vilantui2/refs/heads/main/!'))()
 
@@ -395,7 +396,7 @@ UserInputService.InputBegan:Connect(function(Input, Processed)
                     DestroyCham(TargetAim.LockedTarget.Parent)
                 end
                 if NotifyEnabled then
-                    Library:Notify("Target Released", 2)
+                    Library:Notify("Unlocked", 2)
                 end
                 TargetAim.LockedTarget = nil
             else
@@ -406,7 +407,7 @@ UserInputService.InputBegan:Connect(function(Input, Processed)
                         CreateCham(TargetPlayer.Character)
                     end
                     if NotifyEnabled then
-                        Library:Notify("Locked onto " .. TargetPlayer.Name, 3)
+                        Library:Notify("Locked > " .. TargetPlayer.Name, 3)
                     end
                 end
             end
@@ -640,8 +641,6 @@ end)
 
 local TargetingGroup = MainTab:AddLeftGroupbox('Shoot Gun')
 
-local ReplicatedStorage = game:GetService('ReplicatedStorage')
-
 local lockedTarget = nil
 local StickyAimEnabled = false
 local HighlightEnabled = false
@@ -770,9 +769,9 @@ TargetingGroup:AddDropdown("hp", {
     end
 })
 
-local RightGroupBox = MainTab:AddRightGroupbox('Hitbox Expander')
+hbe = MainTab:AddRightGroupbox('Hitbox Expander')
 
-getgenv().sazurn = {
+getgenv().custom = {
     hitbox_expander = {
         Enabled = false,
         ShowHitboxes = false,
@@ -781,25 +780,23 @@ getgenv().sazurn = {
         ZSize = 1,
         Color = Color3.fromRGB(5, 126, 255),
         Transparency = 0.3,
-        Material = Enum.Material.ForceField,  -- Default material
+        Material = Enum.Material.ForceField,
     }
 }
 
-local LocalPlayer = Players.LocalPlayer
 local TrackedPlayers = {}
 
 local function UpdateHitbox(player, enable)
     if player == LocalPlayer then return end
-
     local character = player.Character
     if character and character:FindFirstChild("HumanoidRootPart") then
         local hrp = character.HumanoidRootPart
         if enable then
-            hrp.Size = Vector3.new(getgenv().sazurn.hitbox_expander.XSize, getgenv().sazurn.hitbox_expander.YSize, getgenv().sazurn.hitbox_expander.ZSize)
-            hrp.Transparency = getgenv().sazurn.hitbox_expander.ShowHitboxes and getgenv().sazurn.hitbox_expander.Transparency or 1
-            hrp.Material = getgenv().sazurn.hitbox_expander.Material
+            hrp.Size = Vector3.new(custom.hitbox_expander.XSize, custom.hitbox_expander.YSize, custom.hitbox_expander.ZSize)
+            hrp.Transparency = custom.hitbox_expander.ShowHitboxes and custom.hitbox_expander.Transparency or 1
+            hrp.Material = custom.hitbox_expander.Material
             hrp.CanCollide = false
-            hrp.Color = getgenv().sazurn.hitbox_expander.Color
+            hrp.Color = custom.hitbox_expander.Color
         else
             hrp.Size = Vector3.new(2, 2, 1)
             hrp.Transparency = 1
@@ -813,7 +810,7 @@ local function TrackPlayers()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and not TrackedPlayers[player] then
             TrackedPlayers[player] = player.CharacterAdded:Connect(function(character)
-                if getgenv().sazurn.hitbox_expander.Enabled then
+                if custom.hitbox_expander.Enabled then
                     UpdateHitbox(player, true)
                 end
                 player.CharacterRemoving:Connect(function()
@@ -827,7 +824,7 @@ end
 local function ApplyHitboxExpander()
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
-            UpdateHitbox(player, getgenv().sazurn.hitbox_expander.Enabled)
+            UpdateHitbox(player, custom.hitbox_expander.Enabled)
         end
     end
 end
@@ -840,11 +837,11 @@ end)
 
 TrackPlayers()
 
-LeftGroupBox:AddToggle('ExpandHitboxToggle', {
+hbe:AddToggle('ExpandHitboxToggle', {
     Text = 'Expand',
     Default = false,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.Enabled = Value
+        custom.hitbox_expander.Enabled = Value
         ApplyHitboxExpander()
     end
 }):AddKeyPicker('HitboxKeybind', {
@@ -853,16 +850,16 @@ LeftGroupBox:AddToggle('ExpandHitboxToggle', {
     Text = '',
     NoUI = false,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.Enabled = not getgenv().sazurn.hitbox_expander.Enabled
+        custom.hitbox_expander.Enabled = not custom.hitbox_expander.Enabled
         ApplyHitboxExpander()
     end
 })
 
-LeftGroupBox:AddToggle('ShowHitboxToggle', {
+hbe:AddToggle('ShowHitboxToggle', {
     Text = 'Show Hitboxes',
     Default = false,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.ShowHitboxes = Value
+        custom.hitbox_expander.ShowHitboxes = Value
         ApplyHitboxExpander()
     end
 }):AddKeyPicker('ShowHitboxKeybind', {
@@ -871,60 +868,60 @@ LeftGroupBox:AddToggle('ShowHitboxToggle', {
     Text = '',
     NoUI = false,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.ShowHitboxes = not getgenv().sazurn.hitbox_expander.ShowHitboxes
+        custom.hitbox_expander.ShowHitboxes = not custom.hitbox_expander.ShowHitboxes
         ApplyHitboxExpander()
     end
 })
 
-LeftGroupBox:AddSlider('XSizeSlider', {
+hbe:AddSlider('XSizeSlider', {
     Text = 'size-X',
     Default = 1,
     Min = 1,
     Max = 30,
     Rounding = 1,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.XSize = Value
+        custom.hitbox_expander.XSize = Value
         ApplyHitboxExpander()
     end
 })
 
-LeftGroupBox:AddSlider('YSizeSlider', {
+hbe:AddSlider('YSizeSlider', {
     Text = 'size-Y',
     Default = 1,
     Min = 1,
     Max = 30,
     Rounding = 1,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.YSize = Value
+        custom.hitbox_expander.YSize = Value
         ApplyHitboxExpander()
     end
 })
 
-LeftGroupBox:AddSlider('ZSizeSlider', {
+hbe:AddSlider('ZSizeSlider', {
     Text = 'size-Z',
     Default = 1,
     Min = 1,
     Max = 30,
     Rounding = 1,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.ZSize = Value
+        custom.hitbox_expander.ZSize = Value
         ApplyHitboxExpander()
     end
 })
 
-LeftGroupBox:AddSlider('TransparencySlider', {
+hbe:AddSlider('TransparencySlider', {
     Text = 'Transparency',
     Default = 0.3,
     Min = 0,
     Max = 1,
     Rounding = 2,
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.Transparency = Value
+        custom.hitbox_expander.Transparency = Value
         ApplyHitboxExpander()
     end
 })
 
-LeftGroupBox:AddDropdown('MaterialDropdown', {
+hbe:AddDropdown('MaterialDropdown', {
     Text = 'Material',
     Default = 'ForceField',
     Values = {
@@ -940,7 +937,7 @@ LeftGroupBox:AddDropdown('MaterialDropdown', {
         'Neon'
     },
     Callback = function(Value)
-        getgenv().sazurn.hitbox_expander.Material = Enum.Material[Value]
+        custom.hitbox_expander.Material = Enum.Material[Value]
         ApplyHitboxExpander()
     end
 })
@@ -1093,7 +1090,7 @@ KillAura:AddToggle('HighlightToggle', {
     end
 })
 
-local MiscGroupBox = MainTab:AddRightGroupbox('M-Misc')
+local MiscGroupBox = MainTab:AddRightGroupbox('Utilitys')
 
 local utility = {}
 getgenv().config = { enable = false, delay = 0.01 }
@@ -1238,6 +1235,44 @@ end)
 game.Players.LocalPlayer.CharacterAdded:Connect(function()
     setupSilentReload(_G.SilentReload)
 end)
+
+MiscGroupBox:AddToggle('HoldFireToggle', {
+    Text = 'Hold Fire',
+    Default = false,
+    Tooltip = 'Hold to auto-shoot for guns like revolver',
+    Callback = function(enabled)
+        config.hold_fire = enabled
+        if not enabled then
+            is_firing = false
+        end
+    end
+})
+
+function Recalculate(Character)
+    if not Character or not Character:FindFirstChild("HumanoidRootPart") then
+        return Vector3.zero
+    end
+
+    local root = Character.HumanoidRootPart
+    local initial = root.Position
+    local startTime = tick()
+
+    task.wait(0.03)
+
+    if not Character or not Character:FindFirstChild("HumanoidRootPart") then
+        return Vector3.zero
+    end
+
+    local final = root.Position
+    local endTime = tick()
+    local deltaTime = endTime - startTime
+
+    if deltaTime <= 0 then
+        return Vector3.zero
+    end
+
+    return (final - initial) / deltaTime
+end 
 
 local uhhh = Tabs.Player:AddLeftGroupbox('Movement')
 
@@ -1556,7 +1591,7 @@ local Toggle = LeftGroupBox:AddToggle('AntiLock', {
 })
 
 LeftGroupBox:AddDropdown('MyDropdown', {
-    Values = { 'Nano sec teleport' },
+    Values = { 'Buzz' },
     Default = 1,
     Multi = false, 
     Text = 'Mode',
@@ -2387,6 +2422,59 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
+local function CreateSkeleton()
+    local skeleton = {}
+    for _ = 1, 6 do
+        local line = Drawing.new("Line")
+        line.Thickness = 1.5
+        line.Color = Color3.fromRGB(255, 255, 255)
+        line.Transparency = 1
+        line.Visible = false
+        table.insert(skeleton, line)
+    end
+    return skeleton
+end
+
+local function UpdateSkeleton(skeleton, character)
+    local function WTVP(part)
+        if not part then return nil end
+        local pos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(part.Position)
+        return onScreen and Vector2.new(pos.X, pos.Y) or nil
+    end
+
+    local parts = {
+        Head = character:FindFirstChild("Head"),
+        UpperTorso = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso"),
+        LeftUpperArm = character:FindFirstChild("LeftUpperArm") or character:FindFirstChild("Left Arm"),
+        RightUpperArm = character:FindFirstChild("RightUpperArm") or character:FindFirstChild("Right Arm"),
+        LeftUpperLeg = character:FindFirstChild("LeftUpperLeg") or character:FindFirstChild("Left Leg"),
+        RightUpperLeg = character:FindFirstChild("RightUpperLeg") or character:FindFirstChild("Right Leg")
+    }
+
+    skeleton[1].From = WTVP(parts.Head)
+    skeleton[1].To = WTVP(parts.UpperTorso)
+
+    skeleton[2].From = WTVP(parts.UpperTorso)
+    skeleton[2].To = WTVP(parts.LeftUpperArm)
+
+    skeleton[3].From = WTVP(parts.UpperTorso)
+    skeleton[3].To = WTVP(parts.RightUpperArm)
+
+    skeleton[4].From = WTVP(parts.UpperTorso)
+    skeleton[4].To = WTVP(parts.LeftUpperLeg)
+
+    skeleton[5].From = WTVP(parts.UpperTorso)
+    skeleton[5].To = WTVP(parts.RightUpperLeg)
+
+    skeleton[6].From = WTVP(parts.LeftUpperLeg)
+    skeleton[6].To = WTVP(parts.RightUpperLeg)
+
+    for _, line in ipairs(skeleton) do
+        line.Visible = (line.From and line.To) and true or false
+        line.Color = getgenv().skeletonESPColor
+    end
+end
+
 local function CreateESP(player)
     if ESPObjects[player] then return end
 
@@ -2410,14 +2498,7 @@ local function CreateESP(player)
         table.insert(corners, line)
     end
 
-    local skeleton = {}
-    for i = 1, 6 do
-        local line = Drawing.new("Line")
-        line.Thickness = 1.5
-        line.Color = getgenv().skeletonESPColor
-        line.Visible = false
-        table.insert(skeleton, line)
-    end
+    local skeleton = CreateSkeleton()
 
     ESPObjects[player] = {
         Box = box,
@@ -2460,12 +2541,7 @@ local function UpdateESP()
                     if getgenv().healthBarEnabled then
                         local healthRatio = humanoid.Health / humanoid.MaxHealth
                         local healthBarX = rootPosition.X - (boxWidth / 2) - 2.3
-                        local healthBarYOffset = 0
-
-                        if getgenv().cornerESPEnabled then
-                            healthBarYOffset = 5
-                        end
-
+                        local healthBarYOffset = getgenv().cornerESPEnabled and 5 or 0
                         local healthBarYStart = headPosition.Y + (boxHeight * (1 - healthRatio)) + healthBarYOffset
                         local healthBarYEnd = footPosition.Y
 
@@ -2511,57 +2587,13 @@ local function UpdateESP()
                             line.Visible = true
                         end
                     else
-                        for _, line in ipairs(objects.Corners) do
-                            line.Visible = false
-                        end
+                        for _, line in ipairs(objects.Corners) do line.Visible = false end
                     end
 
                     if getgenv().skeletonESPEnabled then
-                        local function WTVP(part)
-                            local pos, visible = Camera:WorldToViewportPoint(part.Position)
-                            return Vector2.new(pos.X, pos.Y), visible
-                        end
-
-                        local parts = {
-                            Head = character:FindFirstChild("Head"),
-                            Torso = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso"),
-                            LeftArm = character:FindFirstChild("LeftUpperArm") or character:FindFirstChild("Left Arm"),
-                            RightArm = character:FindFirstChild("RightUpperArm") or character:FindFirstChild("Right Arm"),
-                            LeftLeg = character:FindFirstChild("LeftUpperLeg") or character:FindFirstChild("Left Leg"),
-                            RightLeg = character:FindFirstChild("RightUpperLeg") or character:FindFirstChild("Right Leg")
-                        }
-
-                        if parts.Head and parts.Torso and parts.LeftArm and parts.RightArm and parts.LeftLeg and parts.RightLeg then
-                            local headPos, hV = WTVP(parts.Head)
-                            local torsoPos, tV = WTVP(parts.Torso)
-                            local laPos, laV = WTVP(parts.LeftArm)
-                            local raPos, raV = WTVP(parts.RightArm)
-                            local llPos, llV = WTVP(parts.LeftLeg)
-                            local rlPos, rlV = WTVP(parts.RightLeg)
-
-                            local visible = hV and tV and laV and raV and llV and rlV
-
-                            local skeleton = objects.Skeleton
-                            skeleton[1].From = headPos
-                            skeleton[1].To = torsoPos
-                            skeleton[2].From = torsoPos
-                            skeleton[2].To = laPos
-                            skeleton[3].From = torsoPos
-                            skeleton[3].To = raPos
-                            skeleton[4].From = torsoPos
-                            skeleton[4].To = llPos
-                            skeleton[5].From = torsoPos
-                            skeleton[5].To = rlPos
-
-                            for _, line in ipairs(skeleton) do
-                                line.Color = getgenv().skeletonESPColor
-                                line.Visible = visible
-                            end
-                        end
+                        UpdateSkeleton(objects.Skeleton, character)
                     else
-                        for _, line in ipairs(objects.Skeleton) do
-                            line.Visible = false
-                        end
+                        for _, line in ipairs(objects.Skeleton) do line.Visible = false end
                     end
 
                 else
@@ -2570,17 +2602,7 @@ local function UpdateESP()
                     for _, line in ipairs(objects.Corners) do line.Visible = false end
                     for _, line in ipairs(objects.Skeleton) do line.Visible = false end
                 end
-            else
-                objects.Box.Visible = false
-                objects.HealthBar.Visible = false
-                for _, line in ipairs(objects.Corners) do line.Visible = false end
-                for _, line in ipairs(objects.Skeleton) do line.Visible = false end
             end
-        else
-            objects.Box.Visible = false
-            objects.HealthBar.Visible = false
-            for _, line in ipairs(objects.Corners) do line.Visible = false end
-            for _, line in ipairs(objects.Skeleton) do line.Visible = false end
         end
     end
 end
@@ -2589,12 +2611,8 @@ local function DestroyESP(player)
     if ESPObjects[player] then
         ESPObjects[player].Box:Remove()
         ESPObjects[player].HealthBar:Remove()
-        for _, line in ipairs(ESPObjects[player].Corners) do
-            line:Remove()
-        end
-        for _, line in ipairs(ESPObjects[player].Skeleton or {}) do
-            line:Remove()
-        end
+        for _, line in ipairs(ESPObjects[player].Corners) do line:Remove() end
+        for _, line in ipairs(ESPObjects[player].Skeleton or {}) do line:Remove() end
         ESPObjects[player] = nil
     end
 end
@@ -2619,7 +2637,6 @@ RunService.RenderStepped:Connect(UpdateESP)
 LeftGroupBox:AddToggle('ESP Toggle', {
     Text = 'Enable Boxes',
     Default = false,
-    Tooltip = 'Toggle the ESP boxes on/off',
     Callback = function(Value)
         getgenv().espEnabled = Value
         if not Value then
@@ -2639,7 +2656,6 @@ LeftGroupBox:AddToggle('ESP Toggle', {
 LeftGroupBox:AddToggle('Corner ESP Toggle', {
     Text = 'Enable Corner Boxes',
     Default = false,
-    Tooltip = 'Toggle the corner ESP boxes on/off',
     Callback = function(Value)
         getgenv().cornerESPEnabled = Value
         if not Value then
@@ -2661,7 +2677,6 @@ LeftGroupBox:AddToggle('Corner ESP Toggle', {
 LeftGroupBox:AddToggle('Health Bar Toggle', {
     Text = 'Enable Health Bar',
     Default = false,
-    Tooltip = 'Toggle the ESP health bars on/off',
     Callback = function(Value)
         getgenv().healthBarEnabled = Value
         if not Value then
@@ -2675,7 +2690,6 @@ LeftGroupBox:AddToggle('Health Bar Toggle', {
 LeftGroupBox:AddToggle('Skeleton ESP Toggle', {
     Text = 'Enable Skeleton',
     Default = false,
-    Tooltip = 'Toggle the skeleton ESP on/off',
     Callback = function(Value)
         getgenv().skeletonESPEnabled = Value
         if not Value then
@@ -3063,6 +3077,135 @@ function restoreDefaultLightingSettings()
     end
 end
 
+gamevis = Tabs.Visuals:AddLeftGroupbox("Game Settings")
+
+gamevis:AddToggle('DayToggle', {
+    Text = 'Daytime',
+    Default = false,
+    Tooltip = 'Always be day',
+    Callback = function(state)
+        if state then
+            connection = RunService.Heartbeat:Connect(function()
+                Lighting.TimeOfDay = "14:00:00"
+            end)
+        else
+            if connection then
+                connection:Disconnect()
+                connection = nil
+            end
+            Lighting.TimeOfDay = tostring(math.floor((tick() % 86400) / 3600)) .. ":00:00"
+        end
+    end
+})
+
+gamevis:AddToggle('NoFogToggle', {
+    Text = 'No Fog',
+    Default = false,
+    Tooltip = 'This removes any kind of Fog from the game',
+    Callback = function(Value)
+        local lighting = game:GetService("Lighting")
+
+        if Value then
+            if not _G.FogRemovalExecuted then
+                _G.OriginalFogSettings = {
+                    FogEnd = lighting.FogEnd,
+                    FogStart = lighting.FogStart
+                }
+
+                lighting.FogEnd = 100000
+                lighting.FogStart = 0
+
+                local atmosphere = lighting:FindFirstChildOfClass("Atmosphere")
+                if atmosphere then
+                    atmosphere:Destroy()
+                end
+
+                _G.FogRemovalExecuted = true
+            end
+        else
+            if _G.FogRemovalExecuted then
+                lighting.FogEnd = _G.OriginalFogSettings.FogEnd
+                lighting.FogStart = _G.OriginalFogSettings.FogStart
+                _G.FogRemovalExecuted = false
+            end
+        end
+        print('[cb] NoFogToggle changed to:', Value)
+    end
+})
+
+local BrightnessValue = 5
+
+gamevis:AddToggle('BrightToggle', {
+    Text = 'Full Bright',
+    Default = false,
+    Tooltip = 'Increases brightness',
+    Callback = function(Value)
+        if not _G.FullBrightExecuted then
+            _G.NormalLightingSettings = {
+                Brightness = Lighting.Brightness,
+                ClockTime = Lighting.ClockTime
+            }
+
+            local function setLightingProperties()
+                Lighting.Brightness = BrightnessValue
+                Lighting.ClockTime = 12
+            end
+
+            setLightingProperties()
+
+            Lighting:GetPropertyChangedSignal("Brightness"):Connect(function()
+                if _G.FullBrightEnabled and Lighting.Brightness ~= BrightnessValue then
+                    Lighting.Brightness = BrightnessValue
+                end
+            end)
+
+            Lighting:GetPropertyChangedSignal("ClockTime"):Connect(function()
+                if _G.FullBrightEnabled and Lighting.ClockTime ~= 12 then
+                    Lighting.ClockTime = 12
+                end
+            end)
+
+            task.spawn(function()
+                local LastValue = Value
+                while task.wait() do
+                    if _G.FullBrightEnabled ~= LastValue then
+                        if not _G.FullBrightEnabled then
+                            Lighting.Brightness = _G.NormalLightingSettings.Brightness
+                            Lighting.ClockTime = _G.NormalLightingSettings.ClockTime
+                        else
+                            setLightingProperties()
+                        end
+                        LastValue = _G.FullBrightEnabled
+                    end
+                end
+            end)
+
+            _G.FullBrightExecuted = true
+        end
+
+        _G.FullBrightEnabled = Value
+        if Value then
+            Lighting.Brightness = BrightnessValue
+        else
+            Lighting.Brightness = _G.NormalLightingSettings.Brightness
+        end
+    end
+})
+
+gamevis:AddSlider('BrightnessSlider', {
+    Text = 'Brightness Acuracy',
+    Min = 1,
+    Max = 10,
+    Default = BrightnessValue,
+    Tooltip = 'Adjust brightness level',
+    Callback = function(val)
+        BrightnessValue = val
+        if _G.FullBrightEnabled then
+            Lighting.Brightness = val
+        end
+    end
+})
+
 RightGroupBox = Tabs.Visuals:AddRightGroupbox('Damage Display')
 
 local RaycastParams = RaycastParams.new()
@@ -3207,10 +3350,35 @@ Options.DamageColorPicker:OnChanged(function()
     print('Damage Number Color changed to:', Options.DamageColorPicker.Value)
 end)
 
-local LeftGroupBox = Tabs.Info:AddLeftGroupbox('                       Info')
+local LeftGroupBox = Tabs.Info:AddLeftGroupbox('Settings')
 
-LeftGroupBox:AddLabel('Founder & Developer | @fazefr0')
-LeftGroupBox:AddLabel('Silent aim works only on 90+ UNCs')
+LeftGroupBox:AddButton("Copy Server Link", function()
+    local JobId = game.JobId
+    local PlaceId = game.PlaceId
+
+    if setclipboard and JobId and JobId ~= "" then
+        local serverLink = "https://www.roblox.com/games/" .. PlaceId .. "/join?jobId=" .. JobId
+        setclipboard(serverLink)
+        Library:Notify("Copied server link to clipboard!", 2)
+    else
+        Library:Notify("Failed to copy link. Missing JobId or unsupported executor.", 4)
+        warn("JobId is empty or setclipboard not supported.")
+    end
+end)
+
+local TeleportService = game:GetService("TeleportService")
+
+LeftGroupBox:AddButton("Rejoin Server", function()
+    local PlaceId = game.PlaceId
+    local JobId = game.JobId
+
+    if JobId and JobId ~= "" then
+        TeleportService:TeleportToPlaceInstance(PlaceId, JobId, game.Players.LocalPlayer)
+    else
+        Library:Notify("Failed to rejoin. JobId missing or invalid.", 4)
+        warn("Cannot rejoin: Missing JobId.")
+    end
+end)
 
 local MenuGroup = Tabs['Info']:AddLeftGroupbox('')
 
