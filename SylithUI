@@ -3438,3 +3438,5 @@ function Library:LoadConfig(name)
 		end
 	end
 end
+
+return Library
