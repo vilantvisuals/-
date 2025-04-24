@@ -7,7 +7,7 @@ print("Vilant V2 Loaded")
 print("license: ehzYW378Fwb#####")
 print("STATUS: FREE")
 
-local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/vilantvisuals/vilantui2/refs/heads/main/!'))()
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/refs/heads/main/Library.lua'))()
 
 local Window = Library:CreateWindow({
 
